@@ -22,8 +22,7 @@ import java.util.*
 class UserControllerV1(
     private val createUserCommandHandler: CreateUserCommandHandler,
     private val updateUserProfileCommandHandler: UpdateUserProfileCommandHandler,
-//    private val registerDeviceTokenCommandHandler: RegisterDeviceTokenCommandHandler,
-//    private val removeDeviceTokenCommandHandler: RemoveDeviceTokenCommandHandler,
+    private val updateDeviceTokenCommandHandler: UpdateDeviceTokenCommandHandlerImpl,
     private val getUserByIdQueryHandler: GetUserByIdQueryHandler,
 //    private val getUserByExternalIdQueryHandler: GetUserByExternalIdQueryHandler,
 //    private val getUserDeviceTokensQueryHandler: GetUserDeviceTokensQueryHandler
@@ -31,7 +30,7 @@ class UserControllerV1(
 
     @PostMapping
     @Operation(
-        summary = "사용자 생성",
+        summary = "회원가입",
         description = "새로운 사용자를 시스템에 등록합니다",
         responses = [
             ApiResponse(
@@ -86,6 +85,21 @@ class UserControllerV1(
         )
 
         updateUserProfileCommandHandler.handle(command)
+        return ResponseEntity.noContent().build()
+    }
+
+    @PutMapping("/{userId}/device-tokens")
+    fun updateDeviceToken(
+        @PathVariable userId: UUID,
+        @RequestBody request: UpdateUserDeviceTokenRequest
+    ): ResponseEntity<Void> {
+        val command = UpdateDeviceTokenCommand(
+            userId = userId,
+            deviceToken = request.deviceToken,
+            deviceType = request.deviceType,
+        )
+
+        updateDeviceTokenCommandHandler.handle(command)
         return ResponseEntity.noContent().build()
     }
 }

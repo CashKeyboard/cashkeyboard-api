@@ -54,3 +54,13 @@ data class UpdateUserProfileRequest(
     )
     val ageRange: String? = null
 )
+
+data class UpdateUserDeviceTokenRequest(
+    @field:NotBlank()
+    @Schema(description = "Device Token", example = "...")
+    val deviceToken: String,
+
+    @field:NotBlank()
+    @Schema(description = "Device Type", example = "...")
+    val deviceType: String,
+)

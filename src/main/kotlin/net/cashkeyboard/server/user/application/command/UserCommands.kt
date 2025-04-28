@@ -18,13 +18,8 @@ data class UpdateUserProfileCommand(
     val ageRange: AgeRange? = null
 )
 
-data class RegisterDeviceTokenCommand(
+data class UpdateDeviceTokenCommand(
     val userId: UUID,
     val deviceToken: String,
     val deviceType: String
-)
-
-data class RemoveDeviceTokenCommand(
-    val userId: UUID,
-    val deviceToken: String
 )
