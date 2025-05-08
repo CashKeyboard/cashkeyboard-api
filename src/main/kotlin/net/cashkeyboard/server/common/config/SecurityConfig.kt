@@ -58,10 +58,7 @@ class SecurityConfig(
 
     @Bean
     fun securityFilterChain(http: HttpSecurity, introspector: HandlerMappingIntrospector): SecurityFilterChain {
-        // MVC 패턴 매처 생성
         val mvc = MvcRequestMatcher.Builder(introspector)
-
-        // H2 콘솔용 Ant 패턴 매처 생성 (H2는 MVC가 아님)
         val h2Console = AntPathRequestMatcher("/h2-console/**")
 
         http
@@ -79,10 +76,8 @@ class SecurityConfig(
                     .requestMatchers(mvc.pattern("/api/v1/**")).authenticated()
                     .anyRequest().authenticated()
             }
-            // JWT 필터 추가
             .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter::class.java)
 
-        // H2 콘솔 설정
         http.headers { headers -> headers.frameOptions { it.disable() } }
 
         return http.build()
