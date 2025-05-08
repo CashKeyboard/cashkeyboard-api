@@ -21,13 +21,13 @@ server:
   port: 8080
 
 jwt:
-  secret: ${JWT_SECRET:abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789}
-  expiration: 86400000  # 24??
+  secret: abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789
+  expiration: 86400000  # 24 hours
 
 logging:
   level:
     org.springframework.web: INFO
-    com.example.cashservice: DEBUG
+    net.cashkeyboard.server: DEBUG
     org.hibernate.SQL: DEBUG
 
 springdoc:
@@ -36,3 +36,6 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
     enabled: true
+
+# 로컬 개발 환경에서는 원격 설정 로드 비활성화
+spring.cloud.config.enabled: false
