@@ -69,7 +69,9 @@ class SecurityConfig(
             .httpBasic { it.disable() }
             .authorizeHttpRequests { authorize ->
                 authorize
+                    .requestMatchers(mvc.pattern("/swagger-ui.html")).permitAll()
                     .requestMatchers(mvc.pattern("/swagger-ui/**")).permitAll()
+                    .requestMatchers(mvc.pattern("/api-docs/**")).permitAll()
                     .requestMatchers(h2Console).permitAll()
                     .requestMatchers(mvc.pattern("/api/v1/auth/login")).permitAll()
                     .requestMatchers(mvc.pattern("/api/v1/users")).permitAll()

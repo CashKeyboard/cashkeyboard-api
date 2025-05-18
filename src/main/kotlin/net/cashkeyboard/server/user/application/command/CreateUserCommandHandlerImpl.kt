@@ -2,6 +2,7 @@ package net.cashkeyboard.server.user.application.command
 
 import net.cashkeyboard.server.user.domain.User
 import net.cashkeyboard.server.user.domain.UserRepository
+import net.cashkeyboard.server.user.domain.exception.UserAlreadyExistsException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
@@ -14,7 +15,7 @@ class CreateUserCommandHandlerImpl(
     @Transactional
     override fun handle(command: CreateUserCommand): UUID {
         if (userRepository.findByExternalId(command.externalId).isPresent) {
-            throw IllegalArgumentException("User with external ID ${command.externalId} already exists")
+            throw UserAlreadyExistsException(command.externalId)
         }
 
         val user = User(
