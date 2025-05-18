@@ -20,9 +20,10 @@ spring:
 server:
   port: 8080
 
-jwt:
-  secret: abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789
-  expiration: 86400000  # 24 hours
+app:
+  auth:
+    token-secret: abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789
+    token-expiration-msec: 86400000  # 24 hours
 
 logging:
   level:

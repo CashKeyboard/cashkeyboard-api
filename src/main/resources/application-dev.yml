@@ -12,6 +12,11 @@ spring:
     hibernate:
       ddl-auto: create-drop
 
+app:
+  auth:
+    token-secret: devsecretkeyabcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789
+    token-expiration-msec: 86400000
+
 # 개발 환경에서 사용할 Firebase Admin SDK 설정
 firebase:
   credentials:
