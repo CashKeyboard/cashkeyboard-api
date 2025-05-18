@@ -10,7 +10,15 @@ spring:
       path: /h2-console
   jpa:
     hibernate:
-      ddl-auto: create-drop
+#      ddl-auto: create-drop
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.security.web.FilterChainProxy: DEBUG
+    org.springframework.security.web.access.intercept.FilterSecurityInterceptor: DEBUG
+    net.cashkeyboard.server.common.security: DEBUG
+    net.cashkeyboard.server: DEBUG
 
 app:
   auth:

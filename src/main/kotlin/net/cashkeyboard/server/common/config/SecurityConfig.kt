@@ -3,8 +3,10 @@ package net.cashkeyboard.server.common.config
 import net.cashkeyboard.server.common.security.JwtAuthenticationFilter
 import net.cashkeyboard.server.common.security.JwtTokenProvider
 import net.cashkeyboard.server.user.application.query.GetUserByIdQueryHandler
+import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
@@ -29,6 +31,7 @@ class SecurityConfig(
     private val getUserByIdQueryHandler: GetUserByIdQueryHandler,
     private val jwtTokenProvider: JwtTokenProvider
 ) {
+    private val logger = LoggerFactory.getLogger(SecurityConfig::class.java)
 
     @Bean
     fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
@@ -69,19 +72,29 @@ class SecurityConfig(
             .httpBasic { it.disable() }
             .authorizeHttpRequests { authorize ->
                 authorize
+                    // Error page - must be first
+                    .requestMatchers(mvc.pattern("/error")).permitAll()
+                    // Swagger UI
                     .requestMatchers(mvc.pattern("/swagger-ui.html")).permitAll()
                     .requestMatchers(mvc.pattern("/swagger-ui/**")).permitAll()
                     .requestMatchers(mvc.pattern("/api-docs/**")).permitAll()
+                    .requestMatchers(mvc.pattern("/v3/api-docs/**")).permitAll()
+                    // H2 Console
                     .requestMatchers(h2Console).permitAll()
-                    .requestMatchers(mvc.pattern("/api/v1/auth/login")).permitAll()
-                    .requestMatchers(mvc.pattern("/api/v1/users")).permitAll()
+                    // Authentication API
+                    .requestMatchers(mvc.pattern("/api/v1/auth/**")).permitAll()
+                    // User registration only
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/v1/users")).permitAll()
+                    // All other API endpoints require authentication
                     .requestMatchers(mvc.pattern("/api/v1/**")).authenticated()
+                    // Default
                     .anyRequest().authenticated()
             }
             .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter::class.java)
 
         http.headers { headers -> headers.frameOptions { it.disable() } }
 
+        logger.info("Security filter chain configured successfully")
         return http.build()
     }
 }

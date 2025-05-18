@@ -26,7 +26,6 @@ class JwtAuthenticationFilter(
     ) {
         try {
             val jwt = getJwtFromRequest(request)
-
             if (StringUtils.hasText(jwt)) {
                 try {
                     if (jwtTokenProvider.validateToken(jwt)) {
