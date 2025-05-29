@@ -11,6 +11,8 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
+import net.cashkeyboard.server.common.security.AuthUtil
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -55,6 +57,10 @@ class UserControllerV1(
 
     @GetMapping("/{userId}")
     fun getUserById(@PathVariable userId: UUID): ResponseEntity<UserResponse> {
+        if (!AuthUtil.isCurrentUser(userId)) {
+            throw AccessDeniedException("You can only access your own user information")
+        }
+
         val query = GetUserByIdQuery(userId)
         val userDto = getUserByIdQueryHandler.handle(query)
             ?: return ResponseEntity.notFound().build()
@@ -77,6 +83,10 @@ class UserControllerV1(
         @PathVariable userId: UUID,
         @RequestBody request: UpdateUserProfileRequest
     ): ResponseEntity<Void> {
+        if (!AuthUtil.isCurrentUser(userId)) {
+            throw AccessDeniedException("You can only access your own user information")
+        }
+
         val command = UpdateUserProfileCommand(
             userId = userId,
             name = request.name,
@@ -93,6 +103,10 @@ class UserControllerV1(
         @PathVariable userId: UUID,
         @RequestBody request: UpdateUserDeviceTokenRequest
     ): ResponseEntity<Void> {
+        if (!AuthUtil.isCurrentUser(userId)) {
+            throw AccessDeniedException("You can only access your own user information")
+        }
+
         val command = UpdateDeviceTokenCommand(
             userId = userId,
             deviceToken = request.deviceToken,
