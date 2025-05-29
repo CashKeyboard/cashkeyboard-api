@@ -7,10 +7,14 @@ import org.springframework.context.annotation.Configuration
 @ConfigurationProperties(prefix = "app")
 class AppProperties {
     val auth = Auth()
+    val admin = Admin()
 
     class Auth {
         lateinit var tokenSecret: String
-        var tokenExpirationMsec: Long = 86400000 // 24시간 기본값
-        val authorizedRedirectUris: MutableList<String> = ArrayList()
+        var tokenExpirationMsec: Long = 86400000  // 24 hours
+    }
+
+    class Admin {
+        lateinit var secretKey: String
     }
 }

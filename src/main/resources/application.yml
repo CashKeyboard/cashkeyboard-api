@@ -24,6 +24,8 @@ app:
   auth:
     token-secret: abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789
     token-expiration-msec: 86400000  # 24 hours
+  admin:
+    secret-key: admin_secret_key_2024_change_in_production
 
 logging:
   level:

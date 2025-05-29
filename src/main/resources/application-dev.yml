@@ -10,20 +10,14 @@ spring:
       path: /h2-console
   jpa:
     hibernate:
-#      ddl-auto: create-drop
-
-logging:
-  level:
-    org.springframework.security: DEBUG
-    org.springframework.security.web.FilterChainProxy: DEBUG
-    org.springframework.security.web.access.intercept.FilterSecurityInterceptor: DEBUG
-    net.cashkeyboard.server.common.security: DEBUG
-    net.cashkeyboard.server: DEBUG
+      ddl-auto: create-drop
 
 app:
   auth:
     token-secret: devsecretkeyabcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789
     token-expiration-msec: 86400000
+  admin:
+    secret-key: dev_admin_secret_12345
 
 # 개발 환경에서 사용할 Firebase Admin SDK 설정
 firebase:
