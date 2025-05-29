@@ -15,29 +15,32 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/v1/auth")
-@Tag(name = "Auth API", description = "인증 관련 API")
+@Tag(name = "Authentication API", description = "User authentication API")
 class AuthControllerV1(
     private val loginCommandHandler: LoginCommandHandler
 ) {
 
     @PostMapping("/login")
     @Operation(
-        summary = "로그인",
-        description = "External ID를 사용하여 로그인하고 JWT 토큰을 발급받습니다",
+        summary = "User login",
+        description = """
+            Login with external ID and receive JWT token.
+            
+            **Steps to use JWT token:**
+            1. Call this endpoint with your external ID
+            2. Copy the `accessToken` from the response  
+            3. Click 🔒 "Bearer Authentication" in Swagger UI
+            4. Paste the token (without "Bearer " prefix)
+            5. Click "Authorize" - now you can access protected endpoints
+        """,
         responses = [
             ApiResponse(
                 responseCode = "200",
-                description = "로그인 성공",
+                description = "Login successful",
                 content = [Content(schema = Schema(implementation = LoginResponse::class))]
             ),
-            ApiResponse(
-                responseCode = "401",
-                description = "인증 실패 - 사용자를 찾을 수 없음"
-            ),
-            ApiResponse(
-                responseCode = "400",
-                description = "잘못된 요청 데이터"
-            )
+            ApiResponse(responseCode = "401", description = "Authentication failed - user not found"),
+            ApiResponse(responseCode = "400", description = "Invalid request data")
         ]
     )
     fun login(@Valid @RequestBody request: LoginRequest): ResponseEntity<LoginResponse> {

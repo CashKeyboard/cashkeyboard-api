@@ -5,44 +5,47 @@ import net.cashkeyboard.server.user.application.command.*
 import net.cashkeyboard.server.user.application.query.*
 import net.cashkeyboard.server.user.domain.AgeRange
 import net.cashkeyboard.server.user.domain.Gender
+import net.cashkeyboard.server.common.security.AuthUtil
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
-import net.cashkeyboard.server.common.security.AuthUtil
-import org.springframework.security.access.AccessDeniedException
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
 @RestController
 @RequestMapping("/api/v1/users")
-@Tag(name = "User API", description = "User API")
+@Tag(name = "User API", description = "User management API")
 class UserControllerV1(
     private val createUserCommandHandler: CreateUserCommandHandler,
     private val updateUserProfileCommandHandler: UpdateUserProfileCommandHandler,
     private val updateDeviceTokenCommandHandler: UpdateDeviceTokenCommandHandlerImpl,
     private val getUserByIdQueryHandler: GetUserByIdQueryHandler,
-//    private val getUserByExternalIdQueryHandler: GetUserByExternalIdQueryHandler,
-//    private val getUserDeviceTokensQueryHandler: GetUserDeviceTokensQueryHandler
 ) {
+    private val logger = LoggerFactory.getLogger(UserControllerV1::class.java)
 
     @PostMapping
     @Operation(
-        summary = "회원가입",
-        description = "새로운 사용자를 시스템에 등록합니다",
+        summary = "User registration",
+        description = "Register a new user in the system",
         responses = [
             ApiResponse(
                 responseCode = "201",
-                description = "사용자 생성 성공",
+                description = "User created successfully",
                 content = [Content(schema = Schema(implementation = Map::class))]
-            )
+            ),
+            ApiResponse(responseCode = "400", description = "Invalid user data"),
+            ApiResponse(responseCode = "409", description = "User already exists")
         ]
     )
-    fun createUser(@RequestBody request: CreateUserRequest): ResponseEntity<Map<String, UUID>> {
+    fun createUser(@Valid @RequestBody request: CreateUserRequest): ResponseEntity<Map<String, UUID>> {
         val command = CreateUserCommand(
             externalId = request.externalId,
             name = request.name,
@@ -56,10 +59,31 @@ class UserControllerV1(
     }
 
     @GetMapping("/{userId}")
+    @SecurityRequirement(name = "Bearer Authentication")
+    @Operation(
+        summary = "Get user information",
+        description = "Retrieve user information. Users can only access their own information.",
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "User retrieved successfully",
+                content = [Content(schema = Schema(implementation = UserResponse::class))]
+            ),
+            ApiResponse(responseCode = "401", description = "Authentication required"),
+            ApiResponse(responseCode = "403", description = "Access denied - can only access own information"),
+            ApiResponse(responseCode = "404", description = "User not found")
+        ]
+    )
     fun getUserById(@PathVariable userId: UUID): ResponseEntity<UserResponse> {
+        logger.debug("=== getUserById called ===")
+        logger.debug("Requested user ID: $userId")
+
         if (!AuthUtil.isCurrentUser(userId)) {
+            logger.warn("Access denied: User trying to access another user's information")
             throw AccessDeniedException("You can only access your own user information")
         }
+
+        logger.debug("Authorization passed, querying user data")
 
         val query = GetUserByIdQuery(userId)
         val userDto = getUserByIdQueryHandler.handle(query)
@@ -75,16 +99,29 @@ class UserControllerV1(
             updatedAt = userDto.updatedAt
         )
 
+        logger.debug("Returning user response successfully")
         return ResponseEntity.ok(response)
     }
 
     @PutMapping("/{userId}/profile")
+    @SecurityRequirement(name = "Bearer Authentication")
+    @Operation(
+        summary = "Update user profile",
+        description = "Update user profile information. Users can only update their own profile.",
+        responses = [
+            ApiResponse(responseCode = "204", description = "Profile updated successfully"),
+            ApiResponse(responseCode = "400", description = "Invalid profile data"),
+            ApiResponse(responseCode = "401", description = "Authentication required"),
+            ApiResponse(responseCode = "403", description = "Access denied - can only update own profile"),
+            ApiResponse(responseCode = "404", description = "User not found")
+        ]
+    )
     fun updateUserProfile(
         @PathVariable userId: UUID,
-        @RequestBody request: UpdateUserProfileRequest
+        @Valid @RequestBody request: UpdateUserProfileRequest
     ): ResponseEntity<Void> {
         if (!AuthUtil.isCurrentUser(userId)) {
-            throw AccessDeniedException("You can only access your own user information")
+            throw AccessDeniedException("You can only update your own profile")
         }
 
         val command = UpdateUserProfileCommand(
@@ -99,12 +136,24 @@ class UserControllerV1(
     }
 
     @PutMapping("/{userId}/device-tokens")
+    @SecurityRequirement(name = "Bearer Authentication")
+    @Operation(
+        summary = "Update device token",
+        description = "Update user's device token for push notifications. Users can only update their own device token.",
+        responses = [
+            ApiResponse(responseCode = "204", description = "Device token updated successfully"),
+            ApiResponse(responseCode = "400", description = "Invalid device token data"),
+            ApiResponse(responseCode = "401", description = "Authentication required"),
+            ApiResponse(responseCode = "403", description = "Access denied - can only update own device token"),
+            ApiResponse(responseCode = "404", description = "User not found")
+        ]
+    )
     fun updateDeviceToken(
         @PathVariable userId: UUID,
-        @RequestBody request: UpdateUserDeviceTokenRequest
+        @Valid @RequestBody request: UpdateUserDeviceTokenRequest
     ): ResponseEntity<Void> {
         if (!AuthUtil.isCurrentUser(userId)) {
-            throw AccessDeniedException("You can only access your own user information")
+            throw AccessDeniedException("You can only update your own device token")
         }
 
         val command = UpdateDeviceTokenCommand(
