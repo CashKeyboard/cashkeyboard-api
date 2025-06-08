@@ -26,6 +26,15 @@ app:
     token-expiration-msec: 86400000  # 24 hours
   admin:
     secret-key: admin_secret_key_2024_change_in_production
+  cash:
+    daily-limits:
+      max-earn-amount: 1000
+      max-earn-count: 20
+      max-random-earn-count: 10
+    rate-limits:
+      earn-seconds: 60
+      random-earn-seconds: 60
+      spend-seconds: 30
 
 logging:
   level:

@@ -7,6 +7,7 @@ enum class TransactionType {
 }
 
 enum class EarnSource(val displayName: String, val description: String) {
+    TYPING("키보드 입력", "키보드 입력 보상"),
     AD_WATCH("광고 시청", "동영상 광고 시청 완료"),
     MISSION_COMPLETE("미션 완료", "일일/주간 미션 완료"),
     DAILY_BONUS("일일 보너스", "매일 출석 보너스"),

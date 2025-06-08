@@ -20,7 +20,7 @@ data class CreateUserRequest(
     @Schema(
         description = "성별",
         example = "MALE",
-        allowableValues = ["MALE", "FEMALE", "OTHER"]
+        allowableValues = ["MALE", "FEMALE"]
     )
     val gender: String? = null,
 
@@ -42,7 +42,7 @@ data class UpdateUserProfileRequest(
     @Schema(
         description = "성별",
         example = "MALE",
-        allowableValues = ["MALE", "FEMALE", "OTHER"]
+        allowableValues = ["MALE", "FEMALE"]
     )
     val gender: String? = null,
 

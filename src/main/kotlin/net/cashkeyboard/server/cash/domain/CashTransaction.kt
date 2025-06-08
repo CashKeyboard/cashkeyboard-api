@@ -3,7 +3,6 @@ package net.cashkeyboard.server.cash.domain
 import jakarta.persistence.*
 import net.cashkeyboard.server.common.domain.BaseTimeEntity
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.*
 
 @Entity
@@ -31,20 +30,20 @@ class CashTransaction(
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = true)
-    val source: EarnSource? = null,
+    var source: EarnSource? = null,
 
     @Column(nullable = true)
-    val sourceId: String? = null,
+    var sourceId: String? = null,
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = true)
-    val purpose: SpendPurpose? = null,
+    var purpose: SpendPurpose? = null,
 
     @Column(nullable = true)
-    val targetId: String? = null,
+    var targetId: String? = null,
 
-    @Column(columnDefinition = "jsonb")
-    val metadata: String? = null
+    @Column(columnDefinition = "TEXT")
+    var metadata: String? = null
 
 ) : BaseTimeEntity() {
 

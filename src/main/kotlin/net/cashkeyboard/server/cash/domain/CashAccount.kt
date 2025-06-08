@@ -89,14 +89,4 @@ class CashAccount(
             targetId = targetId
         )
     }
-
-    fun getTodayEarned(): Int {
-        // TODO: 이는 Repository에서 계산하는 것이 더 적절할 수 있음
-        return 0 // placeholder
-    }
-
-    fun getTodaySpent(): Int {
-        // TODO: 이는 Repository에서 계산하는 것이 더 적절할 수 있음
-        return 0 // placeholder
-    }
 }

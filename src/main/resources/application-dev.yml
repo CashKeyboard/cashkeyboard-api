@@ -18,6 +18,15 @@ app:
     token-expiration-msec: 86400000
   admin:
     secret-key: dev_admin_secret_12345
+  cash:
+    daily-limits:
+      max-earn-amount: 1000
+      max-earn-count: 20
+      max-random-earn-count: 10
+    rate-limits:
+      earn-seconds: 60
+      random-earn-seconds: 60
+      spend-seconds: 30
 
 # 개발 환경에서 사용할 Firebase Admin SDK 설정
 firebase:

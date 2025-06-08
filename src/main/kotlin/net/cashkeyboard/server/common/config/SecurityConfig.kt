@@ -132,6 +132,7 @@ class SecurityConfig(
 
                     // User endpoints (require JWT authentication)
                     .requestMatchers(mvc.pattern("/api/v1/products")).authenticated()
+                    .requestMatchers(mvc.pattern("/api/v1/users/*/cash/**")).authenticated()
                     .requestMatchers(mvc.pattern("/api/v1/**")).authenticated()
 
                     .anyRequest().authenticated()
