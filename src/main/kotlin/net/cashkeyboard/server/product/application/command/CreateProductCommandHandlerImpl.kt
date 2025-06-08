@@ -1,7 +1,5 @@
 package net.cashkeyboard.server.product.application.command
 
-import net.cashkeyboard.server.product.domain.Product
-import net.cashkeyboard.server.product.domain.ProductRepository
 import net.cashkeyboard.server.product.domain.exception.DuplicateGoodsCodeException
 import net.cashkeyboard.server.product.domain.exception.InvalidProductDataException
 import org.springframework.stereotype.Service

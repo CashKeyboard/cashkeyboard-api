@@ -1,6 +1,5 @@
 package net.cashkeyboard.server.product.application.query
 
-import net.cashkeyboard.server.product.domain.ProductRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
