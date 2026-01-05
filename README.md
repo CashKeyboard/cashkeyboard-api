@@ -27,7 +27,11 @@
 
 ```mermaid
 graph TB
-    subgraph "API Layer"
+    subgraph Client[" "]
+        HTTP[HTTP Request]
+    end
+    
+    subgraph APILayer["API Layer<br/>HTTP 요청/응답 처리, DTO 변환"]
         AC[AuthController]
         CC[CashController]
         CPC[CouponController]
@@ -35,41 +39,75 @@ graph TB
         PC[ProductController]
     end
     
-    subgraph "Application Layer"
-        subgraph "Command"
-            CH[Command Handlers]
-            CH --> |Write| Domain
+    subgraph AppLayer["Application Layer<br/>비즈니스 로직 조율, 트랜잭션 관리"]
+        subgraph Command["Command (Write)"]
+            CH1[EarnCashCommandHandler]
+            CH2[PurchaseCouponCommandHandler]
+            CH3[CreateUserCommandHandler]
         end
-        subgraph "Query"
-            QH[Query Handlers]
-            QH --> |Read| Domain
+        subgraph Query["Query (Read)"]
+            QH1[GetCashAccountQueryHandler]
+            QH2[GetCouponsQueryHandler]
+            QH3[GetUserQueryHandler]
         end
     end
     
-    subgraph "Domain Layer"
-        DE[Domain Entities]
-        DS[Domain Services]
-        DR[Domain Repositories]
-        DR --> |Persistence| DB[(Database)]
+    subgraph DomainLayer["Domain Layer<br/>핵심 비즈니스 로직, 도메인 규칙"]
+        DE1[CashAccount<br/>CashTransaction<br/>DailyLimit]
+        DE2[Coupon<br/>CouponNotification]
+        DE3[User<br/>UserDeviceToken]
+        DS1[CashDomainService]
+        DS2[CouponDomainService]
+        DR1[CashRepository]
+        DR2[CouponRepository]
+        DR3[UserRepository]
     end
     
-    AC --> CH
-    AC --> QH
-    CC --> CH
-    CC --> QH
-    CPC --> CH
-    CPC --> QH
-    UC --> CH
-    UC --> QH
-    PC --> CH
-    PC --> QH
+    subgraph InfraLayer["Infrastructure Layer<br/>데이터 영속성"]
+        DB[(PostgreSQL<br/>Database)]
+    end
     
-    CH --> DE
-    CH --> DS
-    QH --> DE
-    QH --> DS
-    DS --> DR
+    HTTP --> APILayer
+    AC --> Command
+    AC --> Query
+    CC --> Command
+    CC --> Query
+    CPC --> Command
+    CPC --> Query
+    UC --> Command
+    UC --> Query
+    PC --> Command
+    PC --> Query
+    
+    Command --> DomainLayer
+    Query --> DomainLayer
+    
+    DE1 --> DS1
+    DE2 --> DS2
+    DE3 --> DS1
+    DS1 --> DR1
+    DS2 --> DR2
+    DS1 --> DR3
+    
+    DR1 --> DB
+    DR2 --> DB
+    DR3 --> DB
 ```
+
+**레이어별 역할:**
+
+- **API Layer**: HTTP 요청을 받아 DTO로 변환하고, Application Layer의 Command/Query Handler를 호출합니다.
+- **Application Layer**: 비즈니스 로직을 조율하고 트랜잭션을 관리합니다. CQRS 패턴에 따라 Command(쓰기)와 Query(읽기)로 분리되어 있습니다.
+- **Domain Layer**: 핵심 비즈니스 로직과 도메인 규칙을 포함합니다. Entity, Domain Service, Repository Interface가 위치합니다.
+- **Infrastructure Layer**: 데이터베이스와의 실제 영속성 처리를 담당합니다.
+
+**의존성 방향:**
+
+```
+Client → API Layer → Application Layer → Domain Layer → Infrastructure Layer
+```
+
+각 레이어는 하위 레이어에만 의존하며, 상위 레이어로의 의존성은 없습니다. 이를 통해 각 레이어의 독립성과 테스트 용이성을 확보합니다.
 
 ### CQRS 패턴
 
@@ -355,4 +393,5 @@ java -jar build/libs/cashkeyboard-api-0.0.1-SNAPSHOT.jar
 ## 📝 라이선스
 
 이 프로젝트는 비공개 프로젝트입니다.
+
 
